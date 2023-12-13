@@ -3,12 +3,17 @@ from pyb import Pin
 
 
 class SensorTwoLeds:
-    '''!@brief A driver class for one channel of the L6206.
-    @details Objects of this class can be used to apply PWM to a given
-    DC motor on one channel of the L6206 from ST Microelectronics.
-    '''
 
     def __init__(self, power_pin, control_pin, sig_1_pin, sig_2_pin):
+        """!@brief A driver class for a sensor with two LED sensors on it.
+        @details Objects of this class can be used to read what each sensor on the device on the Romi is currently
+        seeing (black, gray, or white). Objects of this class can also be used to tell RomiController if the sensor sees
+        black, white, or both on the two sensors on the device.
+        @param power_pin the pin that powers the IR sensor
+        @param control_pin the pin that controls that sensitivity of the sensors
+        @param sig_1_pin the pin that is used to read the first sensor
+        @param sig_2_pin the pin that is used to read the second sensor
+        """
         self.power_pin = Pin(power_pin, mode=Pin.OUT)
         self.control_pin = Pin(control_pin, mode=Pin.OUT)
         self.sig_1_pin = Pin(sig_1_pin, mode=Pin.IN)

@@ -3,19 +3,19 @@ from Encoder import *
 import cotask
 from MotorControl import *
 from RomiControl import *
-from blinky_led_gen_fun import *
+from BlinkLedOnNucleo import *
 
 if __name__ == '__main__':
 
-    # Left wheel motor
+    # Left Wheel Motor
     left_encoder = Encoder(3, Pin.cpu.B4, Pin.cpu.B5, 65535, 0)
-    left_motor = L6206(1, Pin.cpu.A9, Pin.cpu.C7, Pin.cpu.A10, left_encoder, 0)
+    left_motor = RomiMotor(1, Pin.cpu.A9, Pin.cpu.C7, Pin.cpu.A10, left_encoder, 0)
     left_motor.set_duty(0)
     left_motor.enable()
 
     # Right Wheel Motor
     right_encoder = Encoder(2, Pin.cpu.A0, Pin.cpu.A1, 65535, 0)
-    right_motor = L6206(8, Pin.cpu.B0, Pin.cpu.B7, Pin.cpu.C1, right_encoder, 1)
+    right_motor = RomiMotor(8, Pin.cpu.B0, Pin.cpu.B7, Pin.cpu.C1, right_encoder, 1)
     right_motor.set_duty(0)
     right_motor.enable()
 
@@ -37,16 +37,16 @@ if __name__ == '__main__':
                         "Task 2", priority=2, period=mot_per)
 
     # User Interface Task
-    task5 = cotask.Task(TaskRomiControlGenFun(motor_A_flag, motor_B_flag, data_A, data_B).simple_line_follow,
-                        "Task 5", priority=1, period=15)
+    task3 = cotask.Task(TaskRomiControlGenFun(motor_A_flag, motor_B_flag, data_A, data_B).simple_line_follow,
+                        "Task 3", priority=1, period=15)
 
     # Blink LED Task (used for ensuring that computer is still multitasking)line_follow
-    task4 = cotask.Task(blinky_gen_fun(1).run, "Task 6", priority=0, period=250)
+    task4 = cotask.Task(BlinkLedGenFun().run, "Task 4", priority=0, period=250)
 
     # Adding Tasks to a Task List
     cotask.task_list.append(task1)
     cotask.task_list.append(task2)
-    cotask.task_list.append(task5)
+    cotask.task_list.append(task3)
     cotask.task_list.append(task4)
 
     # Run All tasks and break from program and send task info if debug key (+) is pressed

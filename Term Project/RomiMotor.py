@@ -1,18 +1,23 @@
 from pyb import Timer
-import pyb
 from pyb import Pin
 from array import array
 from time import ticks_ms
 from time import ticks_diff
 
 
-class L6206:
-    '''!@brief A driver class for one channel of the L6206.
-    @details Objects of this class can be used to apply PWM to a given
-    DC motor on one channel of the L6206 from ST Microelectronics.
-    '''
+class RomiMotor:
 
     def __init__(self, pwm_tim, effort_pin, direction_pin, enable_pin, encoder, invert_flag):
+        """!@brief A driver class for one channel of the RomiMotor.
+        @details Objects of this class can be used to apply PWM to a given
+        DC motor on one channel of the L6206 from ST Microelectronics.
+        @param pwm_tim a timer used send the motor a pwm signal
+        @param effort_pin the pin used to send the duty cycle to the motor
+        @param direction_pin the pin used to tell the motor to go forward to backwards
+        @param enable_pin pin used to allow motor to run
+        @param encoder the encoder object associated with the romi motor used for closed loop speed control
+        @param invert_flag a flag to tell the motor to run opposite in magnitude relative to the values given to it
+        """
         self.tim = Timer(pwm_tim, freq=20_000)
         self.effort_pin = Pin(effort_pin, mode=Pin.OUT_PP)
         self.direction_pin = Pin(direction_pin, mode=Pin.OUT_PP)
@@ -25,23 +30,14 @@ class L6206:
         self.mot_positions = array('H', 500 * [0])
         self.mot_deltas = array('H', 500 * [0])
         self.enc = encoder
-        self.tmp_position = 0
+
         self.current_error = 0
-        self.prop_term = 0
-        self.integral_term = 0
-        self.derivative_term = 0
-        self.speed = 0
-        self.last_error = 0
-        self.error_slope = 0
-        self.sum = 0
         self.rpm_delta = 0
         self.duty = 0
         self.e_sum = 0
         self.kp_term = 0
         self.ki_term = 0
         self.k_total = 0
-        self.freq = 0
-        self.desired_speed = 0
 
         self.first_run = True
         self.freq = 0
@@ -49,6 +45,8 @@ class L6206:
         self.time_stop = 0
 
     def set_duty(self, duty):
+        """!@brief Function within the RomiMotor class to set the current speed of the motor
+        """
 
         if self.invert_flag:
             if duty >= 0:
@@ -69,20 +67,24 @@ class L6206:
                 self.pwm.pulse_width_percent(-duty)
                 self.direction_pin.high()
 
-    def set_speed(self, speed):
-        self.desired_speed = speed
-
     def enable(self):
+        """!@brief Function within the RomiMotor class to set the enable pin of the motor to true
+        """
         self.enable_pin.high()
 
     def disable(self):
+        """!@brief Function within the RomiMotor class to set the enable pin of the motor to false
+        """
         self.enable_pin.low()
 
     def get_speed(self):
+        """!@brief Function within the RomiMotor class to get the current speed of the motor
+        """
         return self.rpm_delta
 
-    # def closed_loop(self,Kp,Ki,Kd,desired_speed,error,freq):
     def closed_loop(self, kp, ki, desired_speed):
+        """!@brief Function within the RomiMotor class to run closed loop control of the motor
+        """
         if self.first_run:
             self.enc.zero()
             self.time_start = ticks_ms()
