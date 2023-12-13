@@ -24,20 +24,21 @@ if __name__ == '__main__':
 
     data_A = task_share.Share('f', name="Data A")
     data_B = task_share.Share('f', name="Data B")
+    data = task_share.Share('f', name="Data")
 
     mot_per = 10
     mot_freq = 1000 / mot_per
 
     # Motor Controller for Motor A
-    task1 = cotask.Task(TaskMotorControl(left_motor, data_A).run,
+    task1 = cotask.Task(TaskMotorControl(left_motor, data_A, data).run,
                         "Task 1", priority=2, period=mot_per)
 
     # Motor Controller for Motor B
-    task2 = cotask.Task(TaskMotorControl(right_motor, data_B).run,
+    task2 = cotask.Task(TaskMotorControl(right_motor, data_B, data).run,
                         "Task 2", priority=2, period=mot_per)
 
     # User Interface Task
-    task3 = cotask.Task(TaskRomiControlGenFun(motor_A_flag, motor_B_flag, data_A, data_B).simple_line_follow,
+    task3 = cotask.Task(TaskRomiControlGenFun(motor_A_flag, motor_B_flag, data_A, data_B, data).simple_line_follow,
                         "Task 3", priority=1, period=15)
 
     # Blink LED Task (used for ensuring that computer is still multitasking)line_follow

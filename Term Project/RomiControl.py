@@ -6,7 +6,7 @@ from pyb import Pin
 
 class TaskRomiControlGenFun:
 
-    def __init__(self, control_flag_a: task_share.Share, control_flag_b: task_share.Share, mot_a_speed, mot_b_speed):
+    def __init__(self, control_flag_a: task_share.Share, control_flag_b: task_share.Share, mot_a_speed, mot_b_speed, data):
         """!@brief This class is for the user interface task
 
             @details This class communicates with the motor controller task to give inputs to the motor and collect
@@ -20,6 +20,9 @@ class TaskRomiControlGenFun:
 
         self.state = 1
         self.next_state = 0
+        self.data = data
+        # self.data.put(value) to update value in share
+        # self.data.get() to return value from share
 
         self.mot_A_flag: task_share.Share = control_flag_a
         self.mot_B_flag: task_share.Share = control_flag_b
@@ -205,23 +208,23 @@ class TaskRomiControlGenFun:
                     self.line_follow_control()
 
             elif self.state == 2:
-            """!@brief This state is Romi's state once a wall has been hit.
-                @details This state tells Romi to go around the perimeter of the box until we see a line. We does this 
-                by going around the box in a clock-wise fashion. The Romi will follow a square path. We stop following 
-                the perimeter of the box once the line sensors picks up a line. This "picking up" of a line is only allowed 
-                when the Romi is going in a straight line. This is done in order to avoid the possibility of picking up an 
-                incorrect line as much as possible. Once we pick up a line, we will turn left in order to follow this new 
-                line. This is due to the fact that the new path we must follow will always jut out of the box, meaning that 
-                since we always go clockwise around the box, the path will always be left of the robot.
-                @param Current_state This variable will tell us what portion of the path we are in. We can either be initializing
-                the path by turning left, going straight, turning right for the edges of the square, or turning left once reading 
-                a line.  
-                @param wall_count A variable that counts down to inform Romi how long to stay in a state. 
-                @param wall_back_count A constant that sets the length of time to reverse.
-                @param wall_left_count A constant that sets the length of time to turn left.
-                @param wall_right_count A constant that sets the length of time to turn right.
-                @param wall_forward_count A constant that sets the length of time to head straight.
-            """
+                """!@brief This state is Romi's state once a wall has been hit.
+                    @details This state tells Romi to go around the perimeter of the box until we see a line. We does this 
+                    by going around the box in a clock-wise fashion. The Romi will follow a square path. We stop following 
+                    the perimeter of the box once the line sensors picks up a line. This "picking up" of a line is only allowed 
+                    when the Romi is going in a straight line. This is done in order to avoid the possibility of picking up an 
+                    incorrect line as much as possible. Once we pick up a line, we will turn left in order to follow this new 
+                    line. This is due to the fact that the new path we must follow will always jut out of the box, meaning that 
+                    since we always go clockwise around the box, the path will always be left of the robot.
+                    @param Current_state This variable will tell us what portion of the path we are in. We can either be initializing
+                    the path by turning left, going straight, turning right for the edges of the square, or turning left once reading 
+                    a line.  
+                    @param wall_count A variable that counts down to inform Romi how long to stay in a state. 
+                    @param wall_back_count A constant that sets the length of time to reverse.
+                    @param wall_left_count A constant that sets the length of time to turn left.
+                    @param wall_right_count A constant that sets the length of time to turn right.
+                    @param wall_forward_count A constant that sets the length of time to head straight.
+                """
                 if self.current_state == "Backwards":
                     if self.wall_count >= self.wall_back_count:
                         self.current_state = "Rotate Left"
