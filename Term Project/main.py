@@ -61,6 +61,7 @@ if __name__ == '__main__':
     cotask.task_list.append(task2)
     cotask.task_list.append(task3)
     cotask.task_list.append(task4)
+    cotask.task_list.append(task5)
 
     # Run All tasks and break from program and send task info if debug key (+) is pressed
     while True:
