@@ -4,6 +4,7 @@ import cotask
 from MotorControl import *
 from RomiControl import *
 from BlinkLedOnNucleo import *
+from IMUController import *
 
 if __name__ == '__main__':
 
@@ -26,17 +27,23 @@ if __name__ == '__main__':
     data_B = task_share.Share('f', name="Data B")
     L_Enc = task_share.Share('f', name="L Enc")
     R_Enc = task_share.Share('f', name="R Enc")
+    L_omega = task_share.Share('f', name="L omega")
+    R_omega = task_share.Share('f', name="L omega")
+    x_coord = task_share.Share('f', name="X Coord")
+    y_coord = task_share.Share('f', name="y Coord")
+
+
 
 
     mot_per = 10
     mot_freq = 1000 / mot_per
 
     # Motor Controller for Motor A (Left)
-    task1 = cotask.Task(TaskMotorControl(left_motor, data_A, L_Enc).run,
+    task1 = cotask.Task(TaskMotorControl(left_motor, data_A, L_Enc, L_omega).run,
                         "Task 1", priority=2, period=mot_per)
 
     # Motor Controller for Motor B (Right)
-    task2 = cotask.Task(TaskMotorControl(right_motor, data_B, R_Enc).run,
+    task2 = cotask.Task(TaskMotorControl(right_motor, data_B, R_Enc, R_omega).run,
                         "Task 2", priority=2, period=mot_per)
 
     # User Interface Task
@@ -45,6 +52,9 @@ if __name__ == '__main__':
 
     # Blink LED Task (used for ensuring that computer is still multitasking)line_follow
     task4 = cotask.Task(BlinkLedGenFun().run, "Task 4", priority=0, period=250)
+    
+    # Positional Calculate
+    task5 = cotask.Task(TaskAquirePositionGenFun(L_omega, R_omega, x_coord, y_coord))
 
     # Adding Tasks to a Task List
     cotask.task_list.append(task1)

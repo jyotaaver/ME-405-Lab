@@ -8,7 +8,7 @@ micropython.alloc_emergency_exception_buf(150)
 
 class TaskMotorControl:
 
-    def __init__(self, motor: RomiMotor, speed_data, encoder_data):
+    def __init__(self, motor: RomiMotor, speed_data, encoder_data, act_speed):
         """!@brief This class is the motor controller for a Romi DC motor.
             @details This class takes the latest speed given to it from the RomiControl task and sets the motor speed to
             the provided speed by running closed loop control of that speed through its motor object
@@ -18,7 +18,7 @@ class TaskMotorControl:
 
         self.state = 1
         self.mot = motor
-        # self.data = data
+        self.omega = act_speed
         self.speed_data = speed_data
         self.position = encoder_data
 
@@ -33,7 +33,7 @@ class TaskMotorControl:
 
             self.desired_speed = self.speed_data.get()
             self.position.put((self.mot.enc.get_position()))
-
+            self.omega.put(self.mot.rpm_delta)
             self.mot.closed_loop(self.kp, self.ki, self.desired_speed)
 
             yield self.state
