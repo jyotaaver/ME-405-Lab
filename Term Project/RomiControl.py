@@ -37,18 +37,19 @@ class TaskRomiControlGenFun:
         
         self.left_position = l_enc
         self.right_position = r_enc
-        self.right_angle_delta = 700
-        self.right_turn_delta = 1400
+
         self.left_zero = 0
         self.right_zero = 0
         self.left_delta = 0
         self.right_delta = 0
 
-        self.control_gain = 0.65
+        # broken gain 0.8
+        self.control_gain = 0.6
 
         self.slow_speed = -10 * self.control_gain
         self.med_speed = -60 * self.control_gain
-        self.high_speed = -65 * self.control_gain
+        # broken top speed 95
+        self.high_speed = -80 * self.control_gain
 
         self.saw_line = 0
         self.internal_count = 0
@@ -57,16 +58,16 @@ class TaskRomiControlGenFun:
         self.tick_distance = 100 * self.control_gain
         self.end_distance = 250 * self.control_gain
 
-        self.wall_high_speed = -100
-        self.wall_med_speed = -60
-        self.wall_slow_speed = -10
+        self.wall_fast_speed = -200
+        self.wall_slow_speed = -60
 
-        self.wall_count = 0
-        self.wall_left_turn_count = 35
-        self.wall_back_count = 10
-        self.wall_right_turn_count = 65
-        self.wall_forward_count = 90
-        self.wall_final_turn_count = 100
+        self.first_in_place_rotate = 650
+        self.final_in_place_rotate = 850
+        self.pivot_rotation_delta = 1440
+        self.wall_straight_delta = 1440*1.5
+        self.wall_semi_final_delta = 1440*0.65
+        self.wall_first_straight_delta = 1440*0.5
+        # self.wall_first_straight_delta = 1440 * 0.75
 
         self.faith_count = 0
         self.faith_limit = 10000
@@ -90,10 +91,10 @@ class TaskRomiControlGenFun:
 
         elif self.current_state == "Turn Left":
             self.left_motor_speed.put(self.slow_speed)
-            self.right_motor_speed.put(self.med_speed)
+            self.right_motor_speed.put(self.high_speed)
 
         elif self.current_state == "Turn Right":
-            self.left_motor_speed.put(self.med_speed)
+            self.left_motor_speed.put(self.high_speed)
             self.right_motor_speed.put(self.slow_speed)
 
         elif self.current_state == "Sharp Left":
@@ -110,28 +111,32 @@ class TaskRomiControlGenFun:
 
     def wall_avoid_control(self):
         if self.current_state == "Go Straight":
-            self.left_motor_speed.put(self.wall_med_speed)
-            self.right_motor_speed.put(self.wall_med_speed)
+            self.left_motor_speed.put(self.wall_fast_speed)
+            self.right_motor_speed.put(self.wall_fast_speed)
 
-        elif self.current_state == "Final":
-            self.left_motor_speed.put(-self.wall_med_speed)
-            self.right_motor_speed.put(self.wall_med_speed)
+        elif self.current_state == "First Straight":
+            self.left_motor_speed.put(self.wall_fast_speed)
+            self.right_motor_speed.put(self.wall_fast_speed)
 
         elif self.current_state == "Turn Right":
-            self.left_motor_speed.put(self.wall_med_speed)
+            self.left_motor_speed.put(self.wall_fast_speed)
             self.right_motor_speed.put(0)
 
         elif self.current_state == "Rotate Left":
-            self.left_motor_speed.put(-self.wall_med_speed)
-            self.right_motor_speed.put(self.wall_med_speed)
+            self.left_motor_speed.put(-self.wall_slow_speed)
+            self.right_motor_speed.put(self.wall_slow_speed)
 
         elif self.current_state == "Rotate Right":
-            self.left_motor_speed.put(self.wall_med_speed)
-            self.right_motor_speed.put(-self.wall_med_speed)
+            self.left_motor_speed.put(self.wall_slow_speed)
+            self.right_motor_speed.put(-self.wall_slow_speed)
 
         elif self.current_state == "Semifinal":
-            self.left_motor_speed.put(self.wall_med_speed)
-            self.right_motor_speed.put(self.wall_med_speed)
+            self.left_motor_speed.put(self.wall_fast_speed)
+            self.right_motor_speed.put(self.wall_fast_speed)
+
+        elif self.current_state == "Final":
+            self.left_motor_speed.put(-self.wall_slow_speed)
+            self.right_motor_speed.put(self.wall_slow_speed)
 
     def run(self):
         while True:
@@ -230,56 +235,69 @@ class TaskRomiControlGenFun:
                     @param Current_state This variable will tell us what portion of the path we are in. We can either be initializing
                     the path by turning left, going straight, turning right for the edges of the square, or turning left once reading 
                     a line.  
-                    @param wall_count A variable that counts down to inform Romi how long to stay in a state. 
                     @param wall_back_count A constant that sets the length of time to reverse.
                     @param wall_left_count A constant that sets the length of time to turn left.
                     @param wall_right_count A constant that sets the length of time to turn right.
                     @param wall_forward_count A constant that sets the length of time to head straight.
                 """
-                if self.current_state == "Semifinal":
-                    if self.right_delta >= self.right_angle_delta // 2:
-                        self.current_state = "Final"
-                        self.right_zero = self.right_position.get()
+
+                if self.current_state == "Rotate Left":
+                    if self.right_delta >= self.first_in_place_rotate:
+                        self.current_state = "First Straight"
                         self.right_delta = 0
+                        self.left_zero = self.left_position.get()
+                        self.right_zero = self.right_position.get()
                     else:
                         self.right_delta = self.right_zero - self.right_position.get()
 
-                elif self.current_state == "Rotate Left":
-                    if self.right_delta >= self.right_angle_delta: #self.wall_count >= self.wall_left_turn_count:
-                        self.current_state = "Go Straight"
-                        self.wall_count = self.wall_left_turn_count
+                if self.current_state == "First Straight":
+                    if self.right_delta >= self.first_in_place_rotate:
+                        self.current_state = "Turn Right"
                         self.right_delta = 0
+                        self.left_zero = self.left_position.get()
+                        self.right_zero = self.right_position.get()
                     else:
-                        self.right_delta = self.right_zero - self.right_position.get()#self.wall_count += 1
+                        self.right_delta = self.right_zero - self.right_position.get()
+
+                elif self.current_state == "Turn Right":
+                    if self.left_delta >= self.pivot_rotation_delta:
+                        self.current_state = "Go Straight"
+                        self.left_delta = 0
+                        self.left_zero = self.left_position.get()
+                        self.left_zero = self.left_position.get()
+                    else:
+                        self.left_delta = self.left_zero - self.left_position.get()
 
                 elif self.current_state == "Go Straight":
                     if self.sensor_A.state() == "Black" and self.sensor_B.state() == "Black":
                         self.current_state = "Semifinal"
+                    else:
+                        if self.left_delta >= self.wall_straight_delta:
+                            self.current_state = "Turn Right"
+                            self.left_delta = 0
+                            self.left_zero = self.left_position.get()
+                            self.right_zero = self.right_position.get()
+                        else:
+                            self.left_delta = self.left_zero - self.left_position.get()
+
+                elif self.current_state == "Semifinal":
+                    if self.left_delta >= self.wall_semi_final_delta:
+                        self.current_state = "Final"
+                        self.left_delta = 0
+                        self.left_zero = self.left_position.get()
                         self.right_zero = self.right_position.get()
                     else:
-                        if self.wall_count >= self.wall_forward_count:
-                            self.current_state = "Turn Right"
-                            self.left_zero = self.left_position.get()
-                            self.wall_count = 0
-                        else:
-                            self.wall_count += 1
-
-                elif self.current_state == "Turn Right":
-                    if self.left_delta >= self.right_turn_delta: #self.wall_count >= self.wall_right_turn_count:
-                        self.current_state = "Go Straight"
-                        self.wall_count = 0
-                        self.left_delta = 0
-                    else:
-                        self.left_delta = self.left_zero - self.left_position.get() #self.wall_count += 1
+                        self.left_delta = self.left_zero - self.left_position.get()
 
                 elif self.current_state == "Final":
-                    if self.right_delta >= self.right_angle_delta: #self.wall_count >= self.wall_final_turn_count:
+                    if self.right_delta >= self.final_in_place_rotate:
                         self.current_state = "Go Straight"
-                        self.wall_count = 0
                         self.state = 1
                         self.right_delta = 0
+                        self.left_zero = self.left_position.get()
+                        self.right_zero = self.right_position.get()
                     else:
-                        self.right_delta = self.right_zero - self.right_position.get()#self.wall_count += 1
+                        self.right_delta = self.right_zero - self.right_position.get()
 
                 self.wall_avoid_control()
 
