@@ -1,2 +1,1 @@
-This is a README file
-theme: jekyll-theme-minimal
+These files are not well organized yet. Sorry ¯\_(ツ)_/¯
