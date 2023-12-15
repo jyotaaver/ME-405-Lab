@@ -1,7 +1,6 @@
 from pyb import I2C
 import time
 from pyb import *
-from L6206 import *
 
 class BNO055:
     '''!@brief A driver class for to interface with a BNO055 sensor.

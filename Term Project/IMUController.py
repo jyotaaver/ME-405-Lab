@@ -1,9 +1,7 @@
 from IMU import *
 import math
-from time import ticks
-from time import ticks_diff
-
-
+from utime import ticks
+from utime import ticks_diff
 
 class TaskAquirePositionGenFun:
     

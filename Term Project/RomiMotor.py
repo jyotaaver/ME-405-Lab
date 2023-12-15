@@ -1,8 +1,8 @@
 from pyb import Timer
 from pyb import Pin
 from array import array
-from time import ticks_ms
-from time import ticks_diff
+from utime import ticks_ms
+from utime import ticks_diff
 
 
 class RomiMotor:
