@@ -1,8 +1,6 @@
 IMUController module
 ====================
 
-
-
 .. automodule:: IMUController
    :members:
    :undoc-members:

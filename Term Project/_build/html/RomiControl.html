@@ -20,7 +20,9 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RomiMotor module" href="RomiMotor.html" />
+    <link rel="prev" title="MotorControl module" href="MotorControl.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,20 +44,36 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">RomiControl module</a><ul>
-<li><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun</span></code></a><ul>
-<li><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.line_follow_control"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.line_follow_control()</span></code></a></li>
-<li><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.run"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.run()</span></code></a></li>
-<li><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.simple_line_follow"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.simple_line_follow()</span></code></a></li>
-<li><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.wall_avoid_control"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.wall_avoid_control()</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Term Project</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="BlinkLedOnNucleo.html">BlinkLedOnNucleo module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Encoder.html">Encoder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IMU.html">IMU module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IMUController.html">IMUController module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LimitSwitch.html">LimitSwitch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MotorControl.html">MotorControl module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RomiControl module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.line_follow_control"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.line_follow_control()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.run"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.toggle_blue_button"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.toggle_blue_button()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#RomiControl.TaskRomiControlGenFun.wall_avoid_control"><code class="docutils literal notranslate"><span class="pre">TaskRomiControlGenFun.wall_avoid_control()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="RomiMotor.html">RomiMotor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Sensor.html">Sensor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot.html">boot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conf.html">conf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cotask.html">cotask module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task_share.html">task_share module</a></li>
 </ul>
-</div>
+</li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -70,6 +88,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Term Project</a></li>
       <li class="breadcrumb-item active">RomiControl module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/RomiControl.rst.txt" rel="nofollow"> View page source</a>
@@ -84,27 +103,33 @@
 <span id="romicontrol-module"></span><h1>RomiControl module<a class="headerlink" href="#module-RomiControl" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="RomiControl.TaskRomiControlGenFun">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RomiControl.</span></span><span class="sig-name descname"><span class="pre">TaskRomiControlGenFun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_flag_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="task_share.html#task_share.Share" title="task_share.Share"><span class="pre">Share</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_flag_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="task_share.html#task_share.Share" title="task_share.Share"><span class="pre">Share</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mot_a_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mot_b_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_enc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_enc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RomiControl.TaskRomiControlGenFun" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RomiControl.</span></span><span class="sig-name descname"><span class="pre">TaskRomiControlGenFun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">control_flag_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="task_share.html#task_share.Share" title="task_share.Share"><span class="pre">Share</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_flag_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="task_share.html#task_share.Share" title="task_share.Share"><span class="pre">Share</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mot_a_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mot_b_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_enc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_enc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blue_button_flag</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RomiControl.TaskRomiControlGenFun" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RomiControl.TaskRomiControlGenFun.line_follow_control">
 <span class="sig-name descname"><span class="pre">line_follow_control</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RomiControl.TaskRomiControlGenFun.line_follow_control" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function used to determine what speeds to send to the motors</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RomiControl.TaskRomiControlGenFun.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RomiControl.TaskRomiControlGenFun.run" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The generator function that runs endlessly within this class to give speed inputs to the motors depending
+on the sensor readings.</p>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RomiControl.TaskRomiControlGenFun.simple_line_follow">
-<span class="sig-name descname"><span class="pre">simple_line_follow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RomiControl.TaskRomiControlGenFun.simple_line_follow" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="RomiControl.TaskRomiControlGenFun.toggle_blue_button">
+<span class="sig-name descname"><span class="pre">toggle_blue_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RomiControl.TaskRomiControlGenFun.toggle_blue_button" title="Link to this definition"></a></dt>
+<dd><p>function called when the blue button is pressed</p>
+<p>The function either disables the robot and resets all major variables or tells all tasks to start running properly</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RomiControl.TaskRomiControlGenFun.wall_avoid_control">
 <span class="sig-name descname"><span class="pre">wall_avoid_control</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RomiControl.TaskRomiControlGenFun.wall_avoid_control" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Function used to determine what speeds to send to the motors during the wall avoidance process</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -113,7 +138,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="MotorControl.html" class="btn btn-neutral float-left" title="MotorControl module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RomiMotor.html" class="btn btn-neutral float-right" title="RomiMotor module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
