@@ -57,6 +57,7 @@ class TaskRomiControlGenFun:
         # TODO fine tune these distances for final map
         self.tick_distance = 100 * self.control_gain
         self.end_distance = 250 * self.control_gain
+        self.end_rotate_distance = 650 * 2
 
         self.wall_fast_speed = -200
         self.wall_slow_speed = -60
@@ -72,6 +73,9 @@ class TaskRomiControlGenFun:
         self.faith_count = 0
         self.faith_limit = 10000
         self.prev_state = ""
+
+        self.half_way = False
+        self.state3_part = 0
 
     """!@brief The generator function that runs endlessly within this class
         """
@@ -281,13 +285,22 @@ class TaskRomiControlGenFun:
                             self.left_delta = self.left_zero - self.left_position.get()
 
                 elif self.current_state == "Semifinal":
-                    if self.left_delta >= self.wall_semi_final_delta:
-                        self.current_state = "Final"
-                        self.left_delta = 0
-                        self.left_zero = self.left_position.get()
-                        self.right_zero = self.right_position.get()
+                    if self.half_way == False:
+                        if self.left_delta >= self.wall_semi_final_delta:
+                            self.current_state = "Final"
+                            self.left_delta = 0
+                            self.left_zero = self.left_position.get()
+                            self.right_zero = self.right_position.get()
+                        else:
+                            self.left_delta = self.left_zero - self.left_position.get()
                     else:
-                        self.left_delta = self.left_zero - self.left_position.get()
+                        if self.left_delta >= self.wall_semi_final_delta*1.4:
+                            self.current_state = "Final"
+                            self.left_delta = 0
+                            self.left_zero = self.left_position.get()
+                            self.right_zero = self.right_position.get()
+                        else:
+                            self.left_delta = self.left_zero - self.left_position.get()
 
                 elif self.current_state == "Final":
                     if self.right_delta >= self.final_in_place_rotate:
@@ -302,10 +315,48 @@ class TaskRomiControlGenFun:
                 self.wall_avoid_control()
 
             elif self.state == 3:
-                if self.internal_count < self.end_distance:
-                    self.internal_count += 1
+                if self.half_way == False:
+                    if self.state3_part == 0:
+                        if self.internal_count < self.end_distance:
+                            self.internal_count += 1
+                            self.left_motor_speed.put(-60 * self.control_gain)
+                            self.right_motor_speed.put(-60 * self.control_gain)
+                        else:
+                            self.state3_part = 1
+                            self.internal_count = 0
+                            self.right_delta = 0
+                            self.right_zero = self.right_position.get()
+
+                    elif self.state3_part == 1:
+                        if self.right_delta >= self.end_rotate_distance:
+                            self.right_delta = 0
+                            self.left_zero = self.left_position.get()
+                            self.right_zero = self.right_position.get()
+                            self.state3_part = 2
+                        else:
+                            self.right_delta = self.right_zero - self.right_position.get()
+                            self.left_motor_speed.put(60)
+                            self.right_motor_speed.put(-60)
+                    elif self.state3_part == 2:
+                        self.state = 1
+                        self.left_motor_speed.put(0)
+                        self.right_motor_speed.put(0)
+                        self.saw_line = 0
+                        self.internal_count = 0
+                        self.start_line = 0
+                        self.half_way = True
+
                 else:
+                    # if self.internal_count < self.end_distance:
+                    #     self.internal_count += 1
+                    #     self.right_motor_speed.put(-40)
+                    #     self.right_motor_speed.put(-40)
+                    # else:
                     self.left_motor_speed.put(0)
                     self.right_motor_speed.put(0)
+                    self.state = 99
+
+            elif self.state == 99:
+                pass
 
             yield self.state

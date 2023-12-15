@@ -6,7 +6,7 @@ import cotask
 from MotorControl import *
 from RomiControl import *
 from BlinkLedOnNucleo import *
-from IMUController import *
+# from IMUController import *
 
 if __name__ == '__main__':
 
@@ -55,15 +55,15 @@ if __name__ == '__main__':
     # Blink LED Task (used for ensuring that computer is still multitasking)line_follow
     task4 = cotask.Task(BlinkLedGenFun().run, "Task 4", priority=0, period=250)
     
-    # Positional Calculate
-    task5 = cotask.Task(TaskAquirePositionGenFun(L_omega, R_omega, x_coord, y_coord))
+    # # Positional Calculate
+    # task5 = cotask.Task(TaskAquirePositionGenFun(L_omega, R_omega, x_coord, y_coord), "Task 5", priority=1, period=15)
 
     # Adding Tasks to a Task List
     cotask.task_list.append(task1)
     cotask.task_list.append(task2)
     cotask.task_list.append(task3)
     cotask.task_list.append(task4)
-    cotask.task_list.append(task5)
+    # cotask.task_list.append(task5)
 
     # Run All tasks and break from program and send task info if debug key (+) is pressed
     while True:

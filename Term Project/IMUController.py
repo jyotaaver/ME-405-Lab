@@ -29,13 +29,15 @@ class TaskAquirePositionGenFun:
     
     def yaw_calc(self):
         self.yaw = self.init_yaw - self.imu.get_heading()
-    
+        yield math.radians(self.yaw)
+
+    # convert rpm to in / s then multiply by time as already done to get in
     def calc_x_pos(self):
-        self.x_pos += (ticks_diff(self.t2, self.t1)) * self.velocity_calc() * math.cos(math.radians(self.yaw_calc()))
+        self.x_pos += (ticks_diff(self.t2, self.t1)) * self.velocity_calc() * math.cos(self.yaw_calc())
         return self.x_pos
         
     def calc_y_pos(self):
-        self.y_pos += (ticks_diff(self.t2, self.t1)) * self.velocity_calc() * math.sin(math.radians(self.yaw_calc()))
+        self.y_pos += (ticks_diff(self.t2, self.t1)) * self.velocity_calc() * math.sin(self.yaw_calc())
         return self.y_pos
         
     def Position_Out(self):
@@ -47,4 +49,4 @@ class TaskAquirePositionGenFun:
                 self.x.put(self.calc_x_position())
                 self.y.put(self.calc_y_position())
                 self.t1 = self.t2
-                yield self.state                
+                yield self.state
