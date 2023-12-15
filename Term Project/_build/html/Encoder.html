@@ -20,7 +20,9 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="IMU module" href="IMU.html" />
+    <link rel="prev" title="BlinkLedOnNucleo module" href="BlinkLedOnNucleo.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,20 +44,36 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Encoder module</a><ul>
-<li><a class="reference internal" href="#Encoder.Encoder"><code class="docutils literal notranslate"><span class="pre">Encoder</span></code></a><ul>
-<li><a class="reference internal" href="#Encoder.Encoder.get_delta"><code class="docutils literal notranslate"><span class="pre">Encoder.get_delta()</span></code></a></li>
-<li><a class="reference internal" href="#Encoder.Encoder.get_position"><code class="docutils literal notranslate"><span class="pre">Encoder.get_position()</span></code></a></li>
-<li><a class="reference internal" href="#Encoder.Encoder.update"><code class="docutils literal notranslate"><span class="pre">Encoder.update()</span></code></a></li>
-<li><a class="reference internal" href="#Encoder.Encoder.zero"><code class="docutils literal notranslate"><span class="pre">Encoder.zero()</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Term Project</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="BlinkLedOnNucleo.html">BlinkLedOnNucleo module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Encoder module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Encoder.Encoder"><code class="docutils literal notranslate"><span class="pre">Encoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Encoder.Encoder.get_delta"><code class="docutils literal notranslate"><span class="pre">Encoder.get_delta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Encoder.Encoder.get_position"><code class="docutils literal notranslate"><span class="pre">Encoder.get_position()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Encoder.Encoder.update"><code class="docutils literal notranslate"><span class="pre">Encoder.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Encoder.Encoder.zero"><code class="docutils literal notranslate"><span class="pre">Encoder.zero()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="IMU.html">IMU module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IMUController.html">IMUController module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LimitSwitch.html">LimitSwitch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MotorControl.html">MotorControl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RomiControl.html">RomiControl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RomiMotor.html">RomiMotor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Sensor.html">Sensor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot.html">boot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conf.html">conf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cotask.html">cotask module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task_share.html">task_share module</a></li>
 </ul>
-</div>
+</li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -70,6 +88,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Term Project</a></li>
       <li class="breadcrumb-item active">Encoder module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/Encoder.rst.txt" rel="nofollow"> View page source</a>
@@ -86,43 +105,53 @@
 <dt class="sig sig-object py" id="Encoder.Encoder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Encoder.</span></span><span class="sig-name descname"><span class="pre">Encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timer_channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_pin_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_pin_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Encoder.Encoder" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p><a class="reference external" href="mailto:!&#37;&#52;&#48;brief">!<span>&#64;</span>brief</a> An encoder class for our motor encoders.
-&#64;details Objects of this class can be used to determine the current
-and change in position of a DC motor on one channel.
-&#64;param timer_channel timer channel used by the encoder to determine position.
-&#64;param encoder_pin_a one of the pins for the encoder to determine position
-&#64;param encoder_pin_b the other pin for the encoder to determine position
-&#64;param ar auto reload value for the motor (set to 65535 for this lab)
-&#64;param ps used if larger steps are needed (set to zero for this lab)</p>
+<p>An encoder class for our motor encoders.</p>
+<p>Objects of this class can be used to determine the current
+and change in position of a DC motor on one channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timer_channel</strong> – timer channel used by the encoder to determine position.</p></li>
+<li><p><strong>encoder_pin_a</strong> – one of the pins for the encoder to determine position</p></li>
+<li><p><strong>encoder_pin_b</strong> – the other pin for the encoder to determine position</p></li>
+<li><p><strong>ar</strong> – auto reload value for the motor (set to 65535 for this lab)</p></li>
+<li><p><strong>ps</strong> – used if larger steps are needed (set to zero for this lab)</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="Encoder.Encoder.get_delta">
 <span class="sig-name descname"><span class="pre">get_delta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Encoder.Encoder.get_delta" title="Link to this definition"></a></dt>
-<dd><p><a class="reference external" href="mailto:!&#37;&#52;&#48;brief">!<span>&#64;</span>brief</a> An function to output the current delta of the motor
-&#64;details Function uses the attribute of the encoder class.
-&#64;retun Returns the delta of the motor.</p>
+<dd><p>A function to output the current delta of the motor</p>
+<p>Function uses the attribute of the encoder class.
+:returns: Returns the delta of the motor.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Encoder.Encoder.get_position">
 <span class="sig-name descname"><span class="pre">get_position</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Encoder.Encoder.get_position" title="Link to this definition"></a></dt>
-<dd><p><a class="reference external" href="mailto:!&#37;&#52;&#48;brief">!<span>&#64;</span>brief</a> An function to output the current position of the motor
-&#64;details Function uses the attribute of the encoder class.
-&#64;retun Returns the position of the motor.</p>
+<dd><p>A function to output the current position of the motor</p>
+<p>Function uses the attribute of the encoder class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns the position of the motor.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Encoder.Encoder.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Encoder.Encoder.update" title="Link to this definition"></a></dt>
-<dd><p><a class="reference external" href="mailto:!&#37;&#52;&#48;brief">!<span>&#64;</span>brief</a> An function to update the current position and delta of the motor.
-&#64;details Function uses the timer counter to determine the delta of the motor
+<dd><p>A function to update the current position and delta of the motor.</p>
+<p>Function uses the timer counter to determine the delta of the motor
 and then calculates the new position of the motor</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Encoder.Encoder.zero">
 <span class="sig-name descname"><span class="pre">zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Encoder.Encoder.zero" title="Link to this definition"></a></dt>
-<dd><p><a class="reference external" href="mailto:!&#37;&#52;&#48;brief">!<span>&#64;</span>brief</a> An function to reset the position in the encoder.
-&#64;details Function sets the position to zero.</p>
+<dd><p>A function to reset the position in the encoder.</p>
+<p>Function sets the position to zero.</p>
 </dd></dl>
 
 </dd></dl>
@@ -132,7 +161,10 @@ and then calculates the new position of the motor</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="BlinkLedOnNucleo.html" class="btn btn-neutral float-left" title="BlinkLedOnNucleo module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="IMU.html" class="btn btn-neutral float-right" title="IMU module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
