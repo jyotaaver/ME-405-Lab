@@ -3,10 +3,14 @@ import time
 from pyb import *
 
 class BNO055:
-    '''!@brief A driver class for to interface with a BNO055 sensor.
-    @details Objects of this class can be used to configure the BNO055 sensor
+    """A driver class to interface with a BNO055 sensor.
+    
+    Objects of this class can be used to configure the BNO055 sensor
     and retrieve data from it.
-    '''
+    
+    Args:
+        bus: The I2C bus that the I2C device is on
+    """
     def __init__(self, bus):
         self.address = 0x28
         self.opr_address = 0x3D
@@ -41,14 +45,13 @@ class BNO055:
         time.sleep(1)
 
     def set_mode(self, addr):
-        # method to change the operating mode of the IMU to one of the many
-        # “fusion” modes available from the BNO055.
-        self.i2c.mem_write(addr, self.address, self.opr_address)
-        # use 0x08 for imu mode
+        """ A method that sets the BNO055 into the fusion/9DOF modes that we desire
+        """
+        self.i2c.mem_write(addr, self.address, self.opr_address) # use 0x08 for imu mode
 
     def calibrate(self):
-        # method to retrieve the calibration status byte from the IMU and parse
-        # it into its individual statuses.
+        """ A method that outputs the IMU/BNO055 to a user interface for debugging
+        """
         while True:
             self.read_calibration()
 
@@ -71,6 +74,8 @@ class BNO055:
         # read all values not just first for each calibration status.
 
     def read_calibration(self):
+        """ A method that reads the calibration status of the IMU/BNO055
+        """
         self.i2c.mem_read(self.data, self.address, 0x35)
         for x in range(4):
             value = self.data[0] & (0b00000011 << x * 2)
@@ -84,6 +89,9 @@ class BNO055:
                 self.sys_cal = value >> x * 2
 
     def read_coeffs(self):
+        """ A method that reads the calibration coefficients of the several 
+        sensors composing the IMU/BNO055, and writing them to a text file
+        """
         for i in range(0x55, 0x6B):
             self.i2c.mem_read(self.data, self.address, i)
             self.calibration_coefficients.append(self.data[0])
@@ -99,6 +107,9 @@ class BNO055:
         self.calibration_coefficients = []
 
     def write_coeffs(self):
+        """ A method that writes the calibration coefficients of the 
+        IMU in order to avoid the need for recalibration
+        """
         with open("IMU_cal_coeffs.txt", "r") as file:
             self.calibration_coefficients = file.readline().split()
             file.close()
@@ -110,10 +121,17 @@ class BNO055:
         self.calibration_coefficients = []
 
     def fix_axis(self):
+        """ A method that sets the appropriate axis for the IMU
+        """
         self.i2c.mem_write(0x24, self.address, 0x41)
         self.i2c.mem_write(0x06, self.address, 0x42)
 
     def read_angles(self):
+        """ A method that reads the roll,pitch, and yaw angles of the IMU
+        
+        Once the MSB and LSB of the 3 euler angles have been concatenated, they are stored in the attribute 
+        self.euler_angles
+        """
         self.i2c.mem_write(0x00, self.address, 0x3B)
 
         self.euler_angles[0] = (self.i2c.mem_read(self.data, self.address, 0x1A)[0] |
@@ -129,5 +147,12 @@ class BNO055:
             self.euler_angles[2] = 360 - (4096 - self.euler_angles[2])
 
     def get_heading(self):
+        """ A method that outputs the yaw angle of the IMU, in relation to North
+        
+        Reads new euler angles of the IMU, and outputs them for use elsewhere
+        
+        Returns:
+            The new yaw angle of Romi in Degrees
+        """
         self.read_angles()
         return self.euler_angles[0]

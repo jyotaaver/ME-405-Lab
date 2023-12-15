@@ -5,14 +5,17 @@ from pyb import Pin
 class SensorTwoLeds:
 
     def __init__(self, power_pin, control_pin, sig_1_pin, sig_2_pin):
-        """!@brief A driver class for a sensor with two LED sensors on it.
-        @details Objects of this class can be used to read what each sensor on the device on the Romi is currently
+        """ A driver class for a sensor with two LED sensors on it.
+        
+        Objects of this class can be used to read what each sensor on the device on the Romi is currently
         seeing (black, gray, or white). Objects of this class can also be used to tell RomiController if the sensor sees
         black, white, or both on the two sensors on the device.
-        @param power_pin the pin that powers the IR sensor
-        @param control_pin the pin that controls that sensitivity of the sensors
-        @param sig_1_pin the pin that is used to read the first sensor
-        @param sig_2_pin the pin that is used to read the second sensor
+        
+        Args:
+            power_pin: the pin that powers the IR sensor
+            control_pin: the pin that controls that sensitivity of the sensors
+            sig_1_pin: the pin that is used to read the first sensor
+            sig_2_pin: the pin that is used to read the second sensor
         """
         self.power_pin = Pin(power_pin, mode=Pin.OUT)
         self.control_pin = Pin(control_pin, mode=Pin.OUT)
@@ -25,12 +28,24 @@ class SensorTwoLeds:
         self.power_pin.high()
 
     def read(self, sensor):
+        """A method that outputs a sensor reading as a value
+        
+        Returns:
+            A value output from the LED sensor
+        """
         if sensor == 1:
             return self.sensor_1.read()
         else:
             return self.sensor_2.read()
 
     def sees(self, sensor):
+        """ A method that outputs the color read by a sensor
+        
+        Certain sensor output values are correlated with either black, gray, or white
+        
+        Returns:
+            Returns the color read by the individual sensor
+        """
         if sensor == 1:
             current_value = self.sensor_1.read()
             if 2000 < current_value < 3200:
@@ -53,6 +68,15 @@ class SensorTwoLeds:
                 return "None"
 
     def state(self):
+        """A method that outputs a value for the two LED sensor object 
+        in accordance to the two individual sensors on an array
+        
+        The output of the two individual sensors are tested to determine if the sensors are either over
+        the line, off the line, or partially over the line
+        
+        Returns:
+            The state of the 2 LED sensor, either a color or condition
+        """
         if self.sees(1) == "Black" and self.sees(2) == "Black":
             return "Black"
         elif self.sees(1) == "White" and self.sees(2) == "White":

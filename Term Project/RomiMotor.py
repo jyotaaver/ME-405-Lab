@@ -8,15 +8,18 @@ from utime import ticks_diff
 class RomiMotor:
 
     def __init__(self, pwm_tim, effort_pin, direction_pin, enable_pin, encoder, invert_flag):
-        """!@brief A driver class for one channel of the RomiMotor.
-        @details Objects of this class can be used to apply PWM to a given
+        """ A driver class for one channel of the RomiMotor.
+        
+        Objects of this class can be used to apply PWM to a given
         DC motor on one channel of the L6206 from ST Microelectronics.
-        @param pwm_tim a timer used send the motor a pwm signal
-        @param effort_pin the pin used to send the duty cycle to the motor
-        @param direction_pin the pin used to tell the motor to go forward to backwards
-        @param enable_pin pin used to allow motor to run
-        @param encoder the encoder object associated with the romi motor used for closed loop speed control
-        @param invert_flag a flag to tell the motor to run opposite in magnitude relative to the values given to it
+        
+        Args:
+            pwm_tim: a timer used send the motor a pwm signal
+            effort_pin: the pin used to send the duty cycle to the motor
+            direction_pin: the pin used to tell the motor to go forward to backwards
+            enable_pin: pin used to allow motor to run
+            encoder: the encoder object associated with the romi motor used for closed loop speed control
+            invert_flag: a flag to tell the motor to run opposite in magnitude relative to the values given to it
         """
         self.tim = Timer(pwm_tim, freq=20_000)
         self.effort_pin = Pin(effort_pin, mode=Pin.OUT_PP)
@@ -45,7 +48,7 @@ class RomiMotor:
         self.time_stop = 0
 
     def set_duty(self, duty):
-        """!@brief Function within the RomiMotor class to set the current speed of the motor
+        """ Function within the RomiMotor class to set the current speed of the motor
         """
 
         if self.invert_flag:
@@ -68,22 +71,26 @@ class RomiMotor:
                 self.direction_pin.high()
 
     def enable(self):
-        """!@brief Function within the RomiMotor class to set the enable pin of the motor to true
+        """ Function within the RomiMotor class to set the enable pin of the motor to true
         """
         self.enable_pin.high()
 
     def disable(self):
-        """!@brief Function within the RomiMotor class to set the enable pin of the motor to false
+        """ Function within the RomiMotor class to set the enable pin of the motor to false
         """
         self.enable_pin.low()
 
     def get_speed(self):
-        """!@brief Function within the RomiMotor class to get the current speed of the motor
+        """ Function within the RomiMotor class to get the current speed of the motor
+        Returns:
+            Returns the speed of the motor in rpm
         """
         return self.rpm_delta
 
     def closed_loop(self, kp, ki, desired_speed):
-        """!@brief Function within the RomiMotor class to run closed loop control of the motor
+        """ Function within the RomiMotor class to run closed loop control of the motor
+        
+        Sets the duty cycles of the motor utilizing a desired speed and a PI Controller
         """
         if self.first_run:
             self.enc.zero()

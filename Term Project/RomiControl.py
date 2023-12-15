@@ -278,6 +278,9 @@ class TaskRomiControlGenFun:
                     a line.  
                     
                     Args:
+                        Current_state: This variable will tell us what portion of the path we are in. We can either be initializing
+                        the path by turning left, going straight, turning right for the edges of the square, or turning left once reading 
+                        a line.
                         wall_back_count: A constant that sets the length of time to reverse.
                         wall_left_count: A constant that sets the length of time to turn left.
                         wall_right_count: A constant that sets the length of time to turn right.
