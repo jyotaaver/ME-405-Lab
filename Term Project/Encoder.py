@@ -2,15 +2,18 @@ import pyb
 
 
 class Encoder:
-    """!@brief An encoder class for our motor encoders.
-        @details Objects of this class can be used to determine the current
+    """ An encoder class for our motor encoders.
+        
+        Objects of this class can be used to determine the current
         and change in position of a DC motor on one channel.
-        @param timer_channel timer channel used by the encoder to determine position.
-        @param encoder_pin_a one of the pins for the encoder to determine position
-        @param encoder_pin_b the other pin for the encoder to determine position
-        @param ar auto reload value for the motor (set to 65535 for this lab)
-        @param ps used if larger steps are needed (set to zero for this lab)
-        """
+        
+        Args:
+             timer_channel: timer channel used by the encoder to determine position.
+             encoder_pin_a: one of the pins for the encoder to determine position
+             encoder_pin_b: the other pin for the encoder to determine position
+             ar: auto reload value for the motor (set to 65535 for this lab)
+             ps: used if larger steps are needed (set to zero for this lab)
+    """
     def __init__(self, timer_channel, encoder_pin_a, encoder_pin_b, ar, ps):
         self.timer_channel = timer_channel
         self.encoder_pin_A = encoder_pin_a
@@ -34,10 +37,11 @@ class Encoder:
         self.PS = ps
 
     def update(self):
-        """!@brief An function to update the current position and delta of the motor.
-            @details Function uses the timer counter to determine the delta of the motor
+        """ A function to update the current position and delta of the motor.
+            
+            Function uses the timer counter to determine the delta of the motor
             and then calculates the new position of the motor
-            """
+        """
 
         self.count = self.timer.counter()
         self.delta = self.count - self.prev_count
@@ -52,21 +56,27 @@ class Encoder:
         self.position += self.delta
 
     def get_position(self):
-        """!@brief An function to output the current position of the motor
-            @details Function uses the attribute of the encoder class.
-            @retun Returns the position of the motor.
-            """
+        """ A function to output the current position of the motor
+            
+            Function uses the attribute of the encoder class.
+            
+            Returns:
+                Returns the position of the motor.
+        """
         return self.position
 
     def get_delta(self):
-        """!@brief An function to output the current delta of the motor
-            @details Function uses the attribute of the encoder class.
-            @retun Returns the delta of the motor.
-            """
+        """ A function to output the current delta of the motor
+            
+            Function uses the attribute of the encoder class.
+            Returns:
+                Returns the delta of the motor.
+        """
         return self.delta
 
     def zero(self):
-        """!@brief An function to reset the position in the encoder.
-            @details Function sets the position to zero.
-            """
+        """ A function to reset the position in the encoder.
+            
+            Function sets the position to zero.
+        """
         self.position = 0
