@@ -1,24 +1,31 @@
 import task_share
 from Sensor import *
 from LimitSwitch import *
-from pyb import Pin
+from pyb import Pin, ExtInt
 
 
 class TaskRomiControlGenFun:
 
-    def __init__(self, control_flag_a: task_share.Share, control_flag_b: task_share.Share, mot_a_speed, mot_b_speed, l_enc, r_enc):
-        """!@brief This class is for the user interface task
+    def __init__(self, control_flag_a: task_share.Share, control_flag_b: task_share.Share, mot_a_speed, mot_b_speed,
+                 l_enc, r_enc, blue_button_flag):
+        """ This class is used to send signals to the motors based upon the sensor inputs
 
-            @details This class communicates with the motor controller task to give inputs to the motor and collect
+            This class communicates with the motor controller task to give inputs to the motor and collect
             data
-            @param control_flag_a A shared variable between this task and one of the motor tasks to tell that motor task
-            what it needs to do independently of the other motor tasks
-            @param control_flag_b A shared variable between this task and one of the motor tasks to tell that motor task
-            what it needs to do independently of the other motor tasks
-            @debug a flag to indicate weather or not to print debug statements from this task
-            """
 
-        self.state = 1
+            Args:
+                control_flag_a: A shared variable between this task and one of the motor tasks to tell that motor task
+                    what it needs to do independently of the other motor tasks
+                control_flag_b: A shared variable between this task and one of the motor tasks to tell that motor task
+                    what it needs to do independently of the other motor tasks
+                mot_a_speed: speed to be sent to the left motor
+                mot_b_speed: speed to be sent to the right motor
+                l_enc: left encoder
+                r_enc: right encoder
+                blue_button_flag: flag used to tell other tasks if the blue button has been pressed
+        """
+
+        self.state = 0
         self.next_state = 0
         # self.data = data
         # self.data.put(value) to update value in share
@@ -54,12 +61,12 @@ class TaskRomiControlGenFun:
         self.saw_line = 0
         self.internal_count = 0
         self.start_line = 0
-        # TODO fine tune these distances for final map
+
         self.tick_distance = 100 * self.control_gain
         self.end_distance = 250 * self.control_gain
         self.end_rotate_distance = 650 * 2
 
-        self.wall_fast_speed = -200
+        self.wall_fast_speed = -100
         self.wall_slow_speed = -60
 
         self.first_in_place_rotate = 650
@@ -77,10 +84,34 @@ class TaskRomiControlGenFun:
         self.half_way = False
         self.state3_part = 0
 
-    """!@brief The generator function that runs endlessly within this class
+        self.blue_button_flag = blue_button_flag
+        self.blue_button = ExtInt(Pin.cpu.C13, ExtInt.IRQ_FALLING, Pin.PULL_NONE, self.toggle_blue_button)
+        self.use_imu = False
+
+    def toggle_blue_button(self, line):
+        """ function called when the blue button is pressed
+
+        The function either disables the robot and resets all major variables or tells all tasks to start running properly
         """
+        if self.state == 0:
+            self.blue_button_flag.put(1)
+            self.state = 1
+        else:
+            self.blue_button_flag.put(0)
+            self.left_motor_speed.put(0)
+            self.right_motor_speed.put(0)
+            self.state = 0
+            self.saw_line = 0
+            self.internal_count = 0
+            self.start_line = 0
+            self.left_zero = 0
+            self.right_zero = 0
+            self.left_delta = 0
+            self.right_delta = 0
+            self.state3_part = 0
 
     def line_follow_control(self):
+        """ Function used to determine what speeds to send to the motors """
         if self.current_state == "Go Straight":
             self.left_motor_speed.put(self.med_speed)
             self.right_motor_speed.put(self.med_speed)
@@ -114,6 +145,7 @@ class TaskRomiControlGenFun:
             self.right_motor_speed.put(0)
 
     def wall_avoid_control(self):
+        """ Function used to determine what speeds to send to the motors during the wall avoidance process"""
         if self.current_state == "Go Straight":
             self.left_motor_speed.put(self.wall_fast_speed)
             self.right_motor_speed.put(self.wall_fast_speed)
@@ -143,15 +175,19 @@ class TaskRomiControlGenFun:
             self.right_motor_speed.put(self.wall_slow_speed)
 
     def run(self):
-        while True:
-            self.simple_line_follow()
-            yield self.state
-
-    def simple_line_follow(self):
+        """The generator function that runs endlessly within this class to give speed inputs to the motors depending
+        on the sensor readings.
+            """
 
         while True:
+
+            if self.state == 0:
+                """ The waiting state for the blue button to be pressed"""
+                pass
 
             if self.state == 1:
+                """ the state to follow the line until the Romi hits a wall or reaches the finish line"""
+
                 if self.bump_sensor.get_state():
                     self.current_state = "Rotate Left"
                     self.right_zero = self.right_position.get()
@@ -228,8 +264,9 @@ class TaskRomiControlGenFun:
                     self.line_follow_control()
 
             elif self.state == 2:
-                """!@brief This state is Romi's state once a wall has been hit.
-                    @details This state tells Romi to go around the perimeter of the box until we see a line. We does this 
+                """ This state is Romi's state once a wall has been hit.
+                    
+                    This state tells Romi to go around the perimeter of the box until we see a line. We does this 
                     by going around the box in a clock-wise fashion. The Romi will follow a square path. We stop following 
                     the perimeter of the box once the line sensors picks up a line. This "picking up" of a line is only allowed 
                     when the Romi is going in a straight line. This is done in order to avoid the possibility of picking up an 
@@ -239,10 +276,12 @@ class TaskRomiControlGenFun:
                     @param Current_state This variable will tell us what portion of the path we are in. We can either be initializing
                     the path by turning left, going straight, turning right for the edges of the square, or turning left once reading 
                     a line.  
-                    @param wall_back_count A constant that sets the length of time to reverse.
-                    @param wall_left_count A constant that sets the length of time to turn left.
-                    @param wall_right_count A constant that sets the length of time to turn right.
-                    @param wall_forward_count A constant that sets the length of time to head straight.
+                    
+                    Args:
+                        wall_back_count: A constant that sets the length of time to reverse.
+                        wall_left_count: A constant that sets the length of time to turn left.
+                        wall_right_count: A constant that sets the length of time to turn right.
+                        wall_forward_count: A constant that sets the length of time to head straight.
                 """
 
                 if self.current_state == "Rotate Left":
@@ -315,46 +354,58 @@ class TaskRomiControlGenFun:
                 self.wall_avoid_control()
 
             elif self.state == 3:
-                if self.half_way == False:
-                    if self.state3_part == 0:
-                        if self.internal_count < self.end_distance:
-                            self.internal_count += 1
-                            self.left_motor_speed.put(-60 * self.control_gain)
-                            self.right_motor_speed.put(-60 * self.control_gain)
-                        else:
-                            self.state3_part = 1
-                            self.internal_count = 0
-                            self.right_delta = 0
-                            self.right_zero = self.right_position.get()
+                """ This state is Romi's state once it has reached the finish line (or start line at the end of the run)
+                    
+                    This state tells Romi to rotate in place 180 degrees then continue forward to trace the path back to 
+                    the start position
+                """
 
-                    elif self.state3_part == 1:
-                        if self.right_delta >= self.end_rotate_distance:
-                            self.right_delta = 0
-                            self.left_zero = self.left_position.get()
-                            self.right_zero = self.right_position.get()
-                            self.state3_part = 2
-                        else:
-                            self.right_delta = self.right_zero - self.right_position.get()
-                            self.left_motor_speed.put(60)
-                            self.right_motor_speed.put(-60)
-                    elif self.state3_part == 2:
-                        self.state = 1
+                if self.use_imu == False:
+                    if self.half_way == False:
+                        if self.state3_part == 0:
+                            if self.internal_count < self.end_distance:
+                                self.internal_count += 1
+                                self.left_motor_speed.put(-60 * self.control_gain)
+                                self.right_motor_speed.put(-60 * self.control_gain)
+                            else:
+                                self.state3_part = 1
+                                self.internal_count = 0
+                                self.right_delta = 0
+                                self.right_zero = self.right_position.get()
+
+                        elif self.state3_part == 1:
+                            if self.right_delta >= self.end_rotate_distance:
+                                self.right_delta = 0
+                                self.left_zero = self.left_position.get()
+                                self.right_zero = self.right_position.get()
+                                self.state3_part = 2
+                            else:
+                                self.right_delta = self.right_zero - self.right_position.get()
+                                self.left_motor_speed.put(60)
+                                self.right_motor_speed.put(-60)
+                        elif self.state3_part == 2:
+                            self.state = 1
+                            self.left_motor_speed.put(0)
+                            self.right_motor_speed.put(0)
+                            self.saw_line = 0
+                            self.internal_count = 0
+                            self.start_line = 0
+                            self.half_way = True
+
+                    else:
+                        # if self.internal_count < self.end_distance:
+                        #     self.internal_count += 1
+                        #     self.right_motor_speed.put(-40)
+                        #     self.right_motor_speed.put(-40)
+                        # else:
                         self.left_motor_speed.put(0)
                         self.right_motor_speed.put(0)
-                        self.saw_line = 0
-                        self.internal_count = 0
-                        self.start_line = 0
-                        self.half_way = True
+                        self.state = 99
 
                 else:
-                    # if self.internal_count < self.end_distance:
-                    #     self.internal_count += 1
-                    #     self.right_motor_speed.put(-40)
-                    #     self.right_motor_speed.put(-40)
-                    # else:
-                    self.left_motor_speed.put(0)
-                    self.right_motor_speed.put(0)
-                    self.state = 99
+                    pass
+
+
 
             elif self.state == 99:
                 pass
