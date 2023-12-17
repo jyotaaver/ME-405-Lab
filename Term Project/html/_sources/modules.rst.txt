@@ -13,8 +13,6 @@ Term Project
    RomiControl
    RomiMotor
    Sensor
-   boot
-   conf
    cotask
    main
    task_share
