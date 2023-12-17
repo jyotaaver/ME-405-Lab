@@ -1,5 +1,3 @@
-""" Description of this file """
-
 from pyb import Pin, Timer
 from Encoder import *
 import cotask
